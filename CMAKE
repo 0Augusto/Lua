@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.10)
+project(BotProject)
+
+# Configura o C++ Standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Encontre o Lua
+find_package(Lua REQUIRED)
+
+# Define a biblioteca LÖVE
+set(LOVE_DIR "/usr/local/Cellar/love/11.4") # Atualize com o caminho correto para a instalação do LÖVE
+
+# Inclua os diretórios de cabeçalhos
+include_directories(${LUA_INCLUDE_DIRS} ${LOVE_DIR}/include)
+
+# Adiciona o arquivo fonte principal
+add_executable(BotProject main.cpp)
+
+# Linka com a biblioteca Lua e LÖVE
+target_link_libraries(BotProject ${LUA_LIBRARIES})
+
+# Adiciona diretórios de scripts e recursos
+file(GLOB LUA_SCRIPTS "bot_project/*.lua")
+file(GLOB ASSETS "bot_project/assets/*")
+
+# Copia os scripts e assets para o diretório de saída
+add_custom_command(TARGET BotProject POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/bot_project
+        $<TARGET_FILE_DIR:BotProject>/bot_project
+)
+
+# Adiciona o caminho para a execução do LÖVE
+set_target_properties(BotProject PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bot_project
+)
+
